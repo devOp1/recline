@@ -67,7 +67,6 @@ my.Map = Backbone.View.extend({
       options.state
     );
     this.state = new recline.Model.ObjectState(stateData);
-
     this._clusterOptions = {
       zoomToBoundsOnClick: true,
       //disableClusteringAtZoom: 10,
@@ -377,8 +376,14 @@ my.Map = Backbone.View.extend({
       return value;
     } else if (this.state.get('lonField') && this.state.get('latField')){
       // We'll create a GeoJSON like point object from the two lat/lon fields
+      
       var lon = doc.get(this.state.get('lonField'));
       var lat = doc.get(this.state.get('latField'));
+      
+      // Replaces in lat- and lonField , with . as decimal seperator
+      lon = lon.replace(",", ".");
+      lat = lat.replace(",", ".");
+
       if (!isNaN(parseFloat(lon)) && !isNaN(parseFloat(lat))) {
         return {
           type: 'Point',
@@ -526,6 +531,9 @@ my.MapMenu = Backbone.View.extend({
       </div> \
       <div class="editor-options" > \
         <label class="checkbox"> \
+          <input type="checkbox" id="editor-comma" value="comma" checked="checked" /> \
+          Comma decimal separator</label> \
+        <label class="checkbox"> \
           <input type="checkbox" id="editor-auto-zoom" value="autozoom" checked="checked" /> \
           Auto zoom to features</label> \
         <label class="checkbox"> \
@@ -542,7 +550,8 @@ my.MapMenu = Backbone.View.extend({
     'click .editor-update-map': 'onEditorSubmit',
     'change .editor-field-type': 'onFieldTypeChange',
     'click #editor-auto-zoom': 'onAutoZoomChange',
-    'click #editor-cluster': 'onClusteringChange'
+    'click #editor-cluster': 'onClusteringChange',
+    'click #editor-comma': 'onDecimalSeperatorChange'
   },
 
   initialize: function(options) {
@@ -582,6 +591,11 @@ my.MapMenu = Backbone.View.extend({
       this.el.find('#editor-cluster').attr('checked', 'checked');
     } else {
       this.el.find('#editor-cluster').removeAttr('checked');
+    }
+    if (this.state.get('comma')) {
+      this.el.find('#editor-comma').attr('checked', 'checked');
+    } else {
+      this.el.find('#editor-comma').removeAttr('checked');
     }
     return this;
   },
@@ -635,6 +649,10 @@ my.MapMenu = Backbone.View.extend({
 
   onClusteringChange: function(e){
     this.state.set({cluster: !this.state.get('cluster')});
+  },
+  
+  onDecimalSeperatorChange: function(e){
+    this.state.set({comma: !this.state.get('comma')});
   },
 
   // Private: Helper function to select an option from a select list
