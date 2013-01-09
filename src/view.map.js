@@ -381,8 +381,10 @@ my.Map = Backbone.View.extend({
       var lat = doc.get(this.state.get('latField'));
       
       // Replaces in lat- and lonField , with . as decimal seperator
-      lon = lon.replace(",", ".");
-      lat = lat.replace(",", ".");
+      if(this.state.get('comma')) {
+        lon = lon.replace(",", ".");
+        lat = lat.replace(",", ".");
+      }
 
       if (!isNaN(parseFloat(lon)) && !isNaN(parseFloat(lat))) {
         return {
