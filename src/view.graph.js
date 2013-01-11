@@ -36,6 +36,7 @@ my.Graph = Backbone.View.extend({
 
   initialize: function(options) {
     var self = this;
+    this.plot ="";
     this.graphColors = ["#edc240", "#afd8f8", "#cb4b4b", "#4da74d", "#9440ed"];
 
     this.el = $(this.el);
@@ -54,6 +55,7 @@ my.Graph = Backbone.View.extend({
       },
       options.state
     );
+   
     this.state = new recline.Model.ObjectState(stateData);
     this.editor = new my.GraphControls({
       model: this.model,
@@ -92,6 +94,8 @@ my.Graph = Backbone.View.extend({
     if (this.state.get('group') && this.state.get('series')) {
       // faff around with width because flot draws axes *outside* of the element width which means graph can get push down as it hits element next to it
       this.$graph.width(this.el.width() - 20);
+      this.$graph.height(this.el.height()); // Get the height from graph-container
+      
       var series = this.createSeries();
       var options = this.getGraphOptions(this.state.attributes.graphType);
       this.plot = Flotr.draw(this.$graph.get(0), series, options);
@@ -459,4 +463,3 @@ my.GraphControls = Backbone.View.extend({
 });
 
 })(jQuery, recline.View);
-
